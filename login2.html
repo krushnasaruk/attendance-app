@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>DPCE - Digital Learning Portal</title>
+  <style>
+    :root{
+      --bg-a: #0a0e1a;
+      --bg-b: #141b2d;
+      --surface: rgba(255,255,255,0.05);
+      --muted: #94a3b8;
+      --card-shadow: rgba(0,0,0,0.4);
+      --accent-1: linear-gradient(135deg,#10b981 0%, #059669 100%);
+      --accent-2: linear-gradient(135deg,#3b82f6 0%, #1d4ed8 100%);
+      --accent-3: linear-gradient(135deg,#f59e0b 0%, #d97706 100%);
+      --accent-4: linear-gradient(135deg,#8b5cf6 0%, #7c3aed 100%);
+      --glass: rgba(255,255,255,0.04);
+      --text: #f1f5f9;
+      --text-secondary: #cbd5e1;
+      --border: rgba(255,255,255,0.08);
+      --hover: rgba(255,255,255,0.06);
+    }
+
+    /* Ocean Theme */
+    .ocean-theme{
+      --bg-a: #0c1445;
+      --bg-b: #1a237e;
+      --surface: rgba(33,150,243,0.1);
+      --muted: #90caf9;
+      --card-shadow: rgba(0,0,0,0.3);
+      --accent-1: linear-gradient(135deg,#00bcd4 0%, #0097a7 100%);
+      --accent-2: linear-gradient(135deg,#2196f3 0%, #1976d2 100%);
+      --accent-3: linear-gradient(135deg,#ff9800 0%, #f57c00 100%);
+      --accent-4: linear-gradient(135deg,#9c27b0 0%, #7b1fa2 100%);
+      --glass: rgba(33,150,243,0.08);
+      --text: #e3f2fd;
+      --text-secondary: #bbdefb;
+      --border: rgba(33,150,243,0.2);
+      --hover: rgba(33,150,243,0.1);
+    }
+
+    /* Forest Theme */
+    .forest-theme{
+      --bg-a: #0d1b0d;
+      --bg-b: #1b2e1b;
+      --surface: rgba(76,175,80,0.08);
+      --muted: #a5d6a7;
+      --card-shadow: rgba(0,0,0,0.4);
+      --accent-1: linear-gradient(135deg,#4caf50 0%, #388e3c 100%);
+      --accent-2: linear-gradient(135deg,#8bc34a 0%, #689f38 100%);
+      --accent-3: linear-gradient(135deg,#ffc107 0%, #ff8f00 100%);
+      --accent-4: linear-gradient(135deg,#ff5722 0%, #d84315 100%);
+      --glass: rgba(76,175,80,0.06);
+      --text: #e8f5e8;
+      --text-secondary: #c8e6c9;
+      --border: rgba(76,175,80,0.15);
+      --hover: rgba(76,175,80,0.08);
+    }
+
+    /* Sunset Theme */
+    .sunset-theme{
+      --bg-a: #2d1b0d;
+      --bg-b: #4a2c0d;
+      --surface: rgba(255,152,0,0.08);
+      --muted: #ffcc80;
+      --card-shadow: rgba(0,0,0,0.3);
+      --accent-1: linear-gradient(135deg,#ff9800 0%, #f57c00 100%);
+      --accent-2: linear-gradient(135deg,#ff5722 0%, #d84315 100%);
+      --accent-3: linear-gradient(135deg,#e91e63 0%, #c2185b 100%);
+      --accent-4: linear-gradient(135deg,#9c27b0 0%, #7b1fa2 100%);
+      --glass: rgba(255,152,0,0.06);
+      --text: #fff3e0;
+      --text-secondary: #ffe0b2;
+      --border: rgba(255,152,0,0.2);
+      --hover: rgba(255,152,0,0.1);
+    }
+
+    /* Purple Dream Theme */
+    .purple-theme{
+      --bg-a: #1a0d2e;
+      --bg-b: #2d1b69;
+      --surface: rgba(156,39,176,0.1);
+      --muted: #ce93d8;
+      --card-shadow: rgba(0,0,0,0.4);
+      --accent-1: linear-gradient(135deg,#9c27b0 0%, #7b1fa2 100%);
+      --accent-2: linear-gradient(135deg,#673ab7 0%, #512da8 100%);
+      --accent-3: linear-gradient(135deg,#e91e63 0%, #c2185b 100%);
+      --accent-4: linear-gradient(135deg,#00bcd4 0%, #0097a7 100%);
+      --glass: rgba(156,39,176,0.08);
+      --text: #f3e5f5;
+      --text-secondary: #e1bee7;
+      --border: rgba(156,39,176,0.2);
+      --hover: rgba(156,39,176,0.1);
+    }
+
+    /* Light Theme */
+    .light-theme{
+      --bg-a: #fefefe;
+      --bg-b: #f8fafc;
+      --surface: rgba(15,23,42,0.03);
+      --muted: #64748b;
+      --card-shadow: rgba(15,23,42,0.08);
+      --accent-1: linear-gradient(135deg,#059669 0%, #047857 100%);
+      --accent-2: linear-gradient(135deg,#2563eb 0%, #1d4ed8 100%);
+      --accent-3: linear-gradient(135deg,#d97706 0%, #b45309 100%);
+      --accent-4: linear-gradient(135deg,#7c3aed 0%, #6d28d9 100%);
+      --glass: rgba(15,23,42,0.02);
+      --text: #0f172a;
+      --text-secondary: #475569;
+      --border: rgba(15,23,42,0.08);
+      --hover: rgba(15,23,42,0.04);
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
+
+    html,body{height:100%}
+    body{
+      min-height:100vh;
+      background: linear-gradient(180deg,var(--bg-a), var(--bg-b));
+      color:var(--text);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition: background .35s ease, color .35s ease;
+      position:relative;
+      overflow:hidden;
+    }
+
+    /* Background Pattern */
+    body::before{
+      content:"";
+      position:absolute;
+      top:0;left:0;right:0;bottom:0;
+      background-image: 
+        radial-gradient(circle at 20% 80%, rgba(59,130,246,0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(16,185,129,0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(139,92,246,0.05) 0%, transparent 50%);
+      pointer-events:none;
+    }
+
+    .login-container{
+      position:relative;
+      z-index:10;
+      width:100%;
+      max-width:420px;
+      padding:20px;
+    }
+
+    .school-header{
+      text-align:center;
+      margin-bottom:40px;
+    }
+
+    .school-logo{
+      width:80px;
+      height:80px;
+      border-radius:20px;
+      background: var(--accent-2);
+      display:inline-block;
+      margin-bottom:20px;
+      box-shadow: 0 8px 32px rgba(59,130,246,0.3);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .school-logo::before{
+      content:"🎓";
+      position:absolute;
+      top:50%;
+      left:50%;
+      transform:translate(-50%, -50%);
+      font-size:32px;
+    }
+
+    .school-name{
+      font-size:28px;
+      font-weight:700;
+      margin-bottom:8px;
+      background: var(--accent-2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .school-tagline{
+      color:var(--muted);
+      font-size:16px;
+      font-weight:500;
+    }
+
+    .login-card{
+      background:var(--glass);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding:40px 32px;
+      border-radius:24px;
+      border:1px solid var(--border);
+      box-shadow:0 20px 60px var(--card-shadow);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .login-card::before{
+      content:"";
+      position:absolute;
+      top:0;left:0;right:0;
+      height:4px;
+      background: var(--accent-2);
+    }
+
+    .login-title{
+      font-size:24px;
+      font-weight:700;
+      margin-bottom:8px;
+      text-align:center;
+    }
+
+    .login-subtitle{
+      color:var(--muted);
+      text-align:center;
+      margin-bottom:32px;
+      font-size:15px;
+    }
+
+    .user-type-selector{
+      display:flex;
+      background:var(--surface);
+      border-radius:12px;
+      padding:4px;
+      margin-bottom:24px;
+      border:1px solid var(--border);
+    }
+
+    .user-type-btn{
+      flex:1;
+      padding:12px 16px;
+      border:none;
+      background:transparent;
+      color:var(--muted);
+      border-radius:8px;
+      cursor:pointer;
+      font-weight:500;
+      transition:all 0.2s ease;
+      font-size:14px;
+    }
+
+    .user-type-btn.active{
+      background:var(--accent-2);
+      color:#fff;
+      box-shadow:0 4px 12px rgba(59,130,246,0.3);
+    }
+
+    .form-group{
+      margin-bottom:20px;
+    }
+
+    .form-label{
+      display:block;
+      margin-bottom:8px;
+      font-weight:500;
+      color:var(--text);
+      font-size:14px;
+    }
+
+    .form-input{
+      width:100%;
+      padding:14px 16px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background:var(--surface);
+      color:var(--text);
+      outline:none;
+      font-size:15px;
+      transition:all 0.2s ease;
+    }
+
+    .form-input:focus{
+      border-color:rgba(59,130,246,0.5);
+      box-shadow:0 0 0 3px rgba(59,130,246,0.1);
+    }
+
+    .form-input::placeholder{
+      color:var(--muted);
+    }
+
+    .login-btn{
+      width:100%;
+      padding:16px;
+      border:none;
+      border-radius:12px;
+      background:var(--accent-2);
+      color:#fff;
+      font-weight:600;
+      font-size:16px;
+      cursor:pointer;
+      transition:all 0.2s ease;
+      box-shadow:0 8px 24px rgba(59,130,246,0.3);
+      margin-top:8px;
+    }
+
+    .login-btn:hover{
+      transform:translateY(-2px);
+      box-shadow:0 12px 32px rgba(59,130,246,0.4);
+    }
+
+    .login-btn:active{
+      transform:translateY(0);
+    }
+
+    .form-links{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-top:24px;
+      font-size:14px;
+    }
+
+    .form-links a{
+      color:var(--accent-2);
+      text-decoration:none;
+      font-weight:500;
+      transition:color 0.2s ease;
+    }
+
+    .form-links a:hover{
+      color:var(--accent-1);
+    }
+
+    .theme-selector{
+      position:fixed;
+      top:20px;
+      right:20px;
+      z-index:100;
+    }
+
+    .theme-toggle{
+      width:48px;
+      height:48px;
+      border-radius:12px;
+      border:none;
+      cursor:pointer;
+      background:var(--surface);
+      color:var(--text);
+      font-size:18px;
+      display:grid;
+      place-items:center;
+      box-shadow:0 4px 12px var(--card-shadow);
+      transition:all 0.2s ease;
+      margin-bottom:8px;
+    }
+
+    .theme-toggle:hover{
+      background:var(--hover);
+      transform:scale(1.05);
+    }
+
+    .theme-options{
+      position:absolute;
+      top:60px;
+      right:0;
+      background:var(--surface);
+      backdrop-filter: blur(20px);
+      border-radius:12px;
+      border:1px solid var(--border);
+      box-shadow:0 8px 24px var(--card-shadow);
+      padding:8px;
+      display:none;
+      flex-direction:column;
+      gap:4px;
+      min-width:120px;
+    }
+
+    .theme-options.show{
+      display:flex;
+    }
+
+    .theme-option{
+      padding:8px 12px;
+      border-radius:8px;
+      border:none;
+      background:transparent;
+      color:var(--text);
+      cursor:pointer;
+      font-size:12px;
+      font-weight:500;
+      text-align:left;
+      transition:all 0.2s ease;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+
+    .theme-option:hover{
+      background:var(--hover);
+    }
+
+    .theme-option.active{
+      background:var(--accent-2);
+      color:#fff;
+    }
+
+    .theme-color{
+      width:12px;
+      height:12px;
+      border-radius:50%;
+      border:1px solid var(--border);
+    }
+
+    .features-preview{
+      margin-top:32px;
+      padding:24px;
+      background:var(--surface);
+      border-radius:16px;
+      border:1px solid var(--border);
+    }
+
+    .features-title{
+      font-size:16px;
+      font-weight:600;
+      margin-bottom:16px;
+      text-align:center;
+      color:var(--text);
+    }
+
+    .features-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:12px;
+    }
+
+    .feature-item{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    .feature-icon{
+      width:20px;
+      height:20px;
+      border-radius:6px;
+      background:var(--accent-2);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:10px;
+    }
+
+    @media (max-width: 480px) {
+      .login-container{
+        padding:16px;
+      }
+      
+      .login-card{
+        padding:32px 24px;
+      }
+      
+      .school-name{
+        font-size:24px;
+      }
+      
+      .features-grid{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="theme-selector">
+    <button class="theme-toggle" id="themeToggle">🎨</button>
+    <div class="theme-options" id="themeOptions">
+      <button class="theme-option active" data-theme="default">
+        <div class="theme-color" style="background: linear-gradient(45deg, #3b82f6, #10b981);"></div>
+        Default
+      </button>
+      <button class="theme-option" data-theme="ocean">
+        <div class="theme-color" style="background: linear-gradient(45deg, #2196f3, #00bcd4);"></div>
+        Ocean
+      </button>
+      <button class="theme-option" data-theme="forest">
+        <div class="theme-color" style="background: linear-gradient(45deg, #4caf50, #8bc34a);"></div>
+        Forest
+      </button>
+      <button class="theme-option" data-theme="sunset">
+        <div class="theme-color" style="background: linear-gradient(45deg, #ff9800, #ff5722);"></div>
+        Sunset
+      </button>
+      <button class="theme-option" data-theme="purple">
+        <div class="theme-color" style="background: linear-gradient(45deg, #9c27b0, #673ab7);"></div>
+        Purple
+      </button>
+      <button class="theme-option" data-theme="light">
+        <div class="theme-color" style="background: linear-gradient(45deg, #f8fafc, #e2e8f0);"></div>
+        Light
+      </button>
+    </div>
+  </div>
+  
+  <div class="login-container">
+    <div class="school-header">
+      <div class="school-logo"></div>
+      <h1 class="school-name">DPCE</h1>
+      <p class="school-tagline">Digital Learning Portal</p>
+    </div>
+
+    <div class="login-card">
+      <h2 class="login-title">Welcome Back!</h2>
+      <p class="login-subtitle">Sign in to access your dashboard</p>
+
+      <form id="loginForm" onsubmit="return handleLogin(event)">
+        <div class="form-group">
+          <label class="form-label" for="email">Email / Username</label>
+          <input type="text" id="email" class="form-input" placeholder="Enter your email or username" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input type="password" id="password" class="form-input" placeholder="Enter your password" required>
+        </div>
+
+        <button type="submit" class="login-btn" id="loginBtn">
+          Login
+        </button>
+      </form>
+
+      <div class="form-links">
+        <a href="#" onclick="showForgotPassword()">Forgot Password?</a>
+      </div>
+
+      <div class="features-preview">
+        <div class="features-title">Platform Features</div>
+        <div class="features-grid">
+          <div class="feature-item">
+            <div class="feature-icon">📊</div>
+            <span>Attendance Tracking</span>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">📅</div>
+            <span>Class Schedule</span>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">📝</div>
+            <span>Notes & Resources</span>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">📱</div>
+            <span>QR Code System</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Theme system
+    const themeToggle = document.getElementById('themeToggle');
+    const themeOptions = document.getElementById('themeOptions');
+    const themeButtons = document.querySelectorAll('.theme-option');
+    
+    const themes = {
+      default: '',
+      ocean: 'ocean-theme',
+      forest: 'forest-theme',
+      sunset: 'sunset-theme',
+      purple: 'purple-theme',
+      light: 'light-theme'
+    };
+
+    // Toggle theme dropdown
+    themeToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      themeOptions.classList.toggle('show');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!themeToggle.contains(e.target) && !themeOptions.contains(e.target)) {
+        themeOptions.classList.remove('show');
+      }
+    });
+
+    // Theme selection
+    themeButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const theme = btn.dataset.theme;
+        
+        // Remove all theme classes
+        Object.values(themes).forEach(themeClass => {
+          if (themeClass) document.body.classList.remove(themeClass);
+        });
+        
+        // Add selected theme
+        if (themes[theme]) {
+          document.body.classList.add(themes[theme]);
+        }
+        
+        // Update active state
+        themeButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        // Save theme
+        localStorage.setItem('selectedTheme', theme);
+        
+        // Close dropdown
+        themeOptions.classList.remove('show');
+      });
+    });
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem('selectedTheme') || 'default';
+    const themeButton = document.querySelector(`[data-theme="${savedTheme}"]`);
+    if (themeButton) {
+      themeButton.click();
+    }
+
+    // Login button reference
+    const loginBtn = document.getElementById('loginBtn');
+
+    // Login handler
+    function handleLogin(e) {
+      e.preventDefault();
+      
+      const identifierRaw = document.getElementById('email').value.trim();
+      const identifier = identifierRaw.toLowerCase().replace(/\s+/g,' ').trim();
+      const password = document.getElementById('password').value.trim();
+
+      // Validation
+      if (!identifier || !password) {
+        showNotification('Please fill in all fields', 'error');
+        return false;
+      }
+
+      // Your credentials
+      const validEmail = identifierRaw === "krushnasaruk55@gmail.com";
+      const validUsername = identifier === "krushna saruk";
+      const validPassword = password === "12345";
+      
+      if ((validEmail || validUsername) && validPassword) {
+        showNotification('Login successful! Redirecting to student dashboard...', 'success');
+        
+        // Store login status and redirect to student dashboard
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('userType', 'student');
+        
+        setTimeout(() => {
+          window.location.href = 'student.html';
+        }, 1500);
+      } else {
+        showNotification('Invalid credentials! Please try again.', 'error');
+      }
+
+      return false;
+    }
+
+    // Notification system
+    function showNotification(message, type = 'info') {
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: ${type === 'error' ? '#ef4444' : type === 'success' ? '#10b981' : '#3b82f6'};
+        color: white;
+        padding: 12px 24px;
+        border-radius: 12px;
+        font-weight: 500;
+        z-index: 1000;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        animation: slideDown 0.3s ease;
+      `;
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.style.animation = 'slideUp 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+      }, 3000);
+    }
+
+    // Helper functions
+    function showForgotPassword() {
+      showNotification('Please contact your administrator for password reset', 'info');
+    }
+
+    // Add CSS animations
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideDown {
+        from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+        to { transform: translateX(-50%) translateY(0); opacity: 1; }
+      }
+      @keyframes slideUp {
+        from { transform: translateX(-50%) translateY(0); opacity: 1; }
+        to { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Initialize
+    // Login page is ready
+  </script>
+</body>
+</html>
