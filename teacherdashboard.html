@@ -68,6 +68,7 @@
       flex-direction:column;
       gap:8px;
       box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+      z-index:95;
     }
 
     .brand{
@@ -357,7 +358,8 @@
     }
 
     @media (max-width:880px){
-      .sidebar{display:none;position:fixed;left:0;top:0;z-index:60;height:100vh}
+      .sidebar{display:none;position:fixed;left:0;top:0;z-index:120;height:100vh}
+      .sidebar.mobile-open{display:block;width:80vw;max-width:300px;box-shadow:6px 0 24px rgba(0,0,0,0.4);z-index:120}
       .hamburger{display:flex}
       .topbar .search{display:none}
       .grid-2col{grid-template-columns:1fr}
@@ -365,7 +367,14 @@
       .cards{grid-template-columns:1fr 1fr;gap:12px}
       .card{padding:14px}
       .card .big{font-size:18px}
+      /* Hide clock on mobile */
       #current-time{display:none}
+      /* Notes modal mobile layout */
+      #notes-modal .notes-container{width:100% !important;height:100% !important;max-height:100vh !important;border-radius:0 !important}
+      #notes-modal .notes-grid{grid-template-columns:1fr !important}
+      #notes-modal .notes-grid > div:first-child{max-height:40vh;overflow:auto}
+      #notes-modal .notes-grid > div:last-child{min-height:0}
+      #notes-modal .ntb{padding:6px 8px}
     }
 
     .muted{color:var(--muted)}
@@ -429,7 +438,7 @@
 
   <!-- Student QR Scanner Modal -->
   <div id="qr-scanner-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
-    <div style="background: var(--surface); border-radius: 16px; padding: 24px; max-width: 400px; width: 90%; text-align: center; border: 1px solid var(--border);">
+    <div style="background: var(--bg-b); border-radius: 16px; padding: 24px; max-width: 400px; width: 90%; text-align: center; border: 1px solid var(--border);">
       <h3 style="margin-bottom: 16px; color: var(--text);">Scan QR Code</h3>
       <div id="qr-reader" style="width: 100%; max-width: 300px; margin: 0 auto 16px;"></div>
       <p style="color: var(--muted); font-size: 14px; margin-bottom: 16px;">Point your camera at the QR code to mark attendance</p>
@@ -439,7 +448,7 @@
 
   <!-- QR Generator & Attendance Modal -->
   <div id="qr-generator-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
-    <div style="background: var(--surface); border-radius: 16px; padding: 24px; max-width: 800px; width: 95%; max-height: 90vh; overflow-y: auto; border: 1px solid var(--border);">
+    <div style="background: var(--bg-b); border-radius: 16px; padding: 24px; max-width: 800px; width: 95%; max-height: 90vh; overflow-y: auto; border: 1px solid var(--border);">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <h3 style="color: var(--text);">Class Attendance Management</h3>
         <button id="close-generator-btn" style="padding: 8px 12px; background: var(--accent-3); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">✕</button>
@@ -498,6 +507,63 @@
         <h4 style="color: var(--text); margin-bottom: 12px;">Student List</h4>
         <div id="student-list" style="max-height: 300px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px;">
           <!-- Student list will be populated here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notes Modal -->
+  <div id="notes-modal" style="display:none; position:fixed; inset:0; background: rgba(0,0,0,0.8); z-index:1000; align-items:center; justify-content:center;">
+    <div class="notes-container" style="background: var(--bg-b); border:1px solid var(--border); border-radius:16px; width:95%; max-width:1000px; max-height:92vh; display:flex; flex-direction:column; overflow:hidden;">
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--border);">
+        <div style="font-weight:700">Notes</div>
+        <div style="display:flex; gap:8px; align-items:center">
+          <input id="notes-search" placeholder="Search notes..." style="padding:8px 10px; border-radius:8px; border:1px solid var(--border); background:var(--surface); color:var(--text); min-width:220px" />
+          <select id="notes-sort" style="padding:8px 10px; border-radius:8px; border:1px solid var(--border); background:var(--surface); color:var(--text);">
+            <option value="updated-desc">Recently updated</option>
+            <option value="updated-asc">Oldest updated</option>
+            <option value="created-desc">Recently created</option>
+            <option value="created-asc">Oldest created</option>
+            <option value="title-asc">Title A→Z</option>
+            <option value="title-desc">Title Z→A</option>
+          </select>
+          <button id="close-notes-btn" style="padding:8px 10px; background:var(--accent-3); color:white; border-radius:8px; font-weight:600;">✕</button>
+        </div>
+      </div>
+      <div class="notes-grid" style="display:grid; grid-template-columns:320px 1fr; gap:0; flex:1; min-height:0;">
+        <div style="border-right:1px solid var(--border); overflow:auto;">
+          <div style="padding:12px; display:flex; gap:8px;">
+            <button id="new-note-btn" style="flex:1; padding:10px; background:var(--accent-2); color:white; border-radius:8px; font-weight:700;">+ New Note</button>
+          </div>
+          <div id="notes-list" style="padding:8px; display:flex; flex-direction:column; gap:8px;"></div>
+        </div>
+        <div style="display:flex; flex-direction:column; min-width:0;">
+          <div style="display:flex; align-items:center; gap:8px; padding:10px; border-bottom:1px solid var(--border); flex-wrap:wrap;">
+            <input id="note-title" placeholder="Title" style="flex:1; min-width:160px; padding:8px 10px; border-radius:8px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-weight:700;" />
+            <input id="note-tags" placeholder="tags (comma separated)" style="min-width:160px; padding:8px 10px; border-radius:8px; border:1px solid var(--border); background:var(--surface); color:var(--text);" />
+            <input type="color" id="note-color" title="Note color" />
+            <button id="pin-note-btn" title="Pin" style="padding:8px 10px; border:1px solid var(--border); border-radius:8px; background:var(--surface); color:var(--text);">📌</button>
+            <button id="delete-note-btn" title="Delete" style="padding:8px 10px; border:1px solid var(--border); border-radius:8px; background:var(--surface); color:var(--text);">🗑️</button>
+            <button id="export-notes-btn" title="Export" style="padding:8px 10px; border:1px solid var(--border); border-radius:8px; background:var(--surface); color:var(--text);">⬇️ Export</button>
+            <input id="import-notes-input" type="file" accept="application/json" style="display:none" />
+            <button id="import-notes-btn" title="Import" style="padding:8px 10px; border:1px solid var(--border); border-radius:8px; background:var(--surface); color:var(--text);">⬆️ Import</button>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px; padding:8px; border-bottom:1px solid var(--border); flex-wrap:wrap;">
+            <button class="ntb" data-cmd="bold">B</button>
+            <button class="ntb" data-cmd="italic"><i>i</i></button>
+            <button class="ntb" data-cmd="underline"><u>U</u></button>
+            <button class="ntb" data-cmd="strikeThrough"><s>S</s></button>
+            <button class="ntb" data-cmd="insertUnorderedList">• List</button>
+            <button class="ntb" data-cmd="insertOrderedList">1. List</button>
+            <button class="ntb" id="checkbox-list-btn">☑ Checklist</button>
+            <button class="ntb" data-cmd="undo">↶</button>
+            <button class="ntb" data-cmd="redo">↷</button>
+            <button class="ntb" id="link-btn">🔗 Link</button>
+            <input type="color" id="text-color" title="Text color" />
+            <input type="color" id="hilite-color" title="Highlight" />
+            <button class="ntb" id="clear-format-btn">Clear</button>
+          </div>
+          <div id="note-editor" contenteditable="true" style="flex:1; padding:14px; outline:none; overflow:auto; background:var(--surface);"></div>
         </div>
       </div>
     </div>
@@ -588,33 +654,18 @@
 
           <!-- Today's Classes -->
           <div class="class-schedule">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap:8px; margin-bottom: 16px; flex-wrap:wrap;">
               <h3 id="todayScheduleDay">Today's Classes</h3>
-              <select id="classSelector" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 14px;">
-                <option value="all">All Classes</option>
-                <option value="math">Mathematics</option>
-                <option value="physics">Physics</option>
-                <option value="chemistry">Chemistry</option>
-              </select>
-            </div>
-            <div class="schedule" id="scheduleContainer">
-              <div class="slot">
-                <div class="time">09:00 - 10:00</div>
-                <div class="sub">Mathematics-I (Div A)</div>
-              </div>
-              <div class="slot">
-                <div class="time">10:15 - 11:15</div>
-                <div class="sub">Physics (Div B)</div>
-              </div>
-              <div class="slot">
-                <div class="time">11:30 - 12:30</div>
-                <div class="sub">Mathematics-II (Div C)</div>
-              </div>
-              <div class="slot">
-                <div class="time">14:00 - 15:00</div>
-                <div class="sub">Chemistry Lab (Div A)</div>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <select id="divisionSelector" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 14px;">
+                  <option value="A">Division A</option>
+                  <option value="B">Division B</option>
+                  <option value="C">Division C</option>
+                </select>
+                <button id="editTimetableBtn" style="padding:8px 12px; border-radius:8px; border:1px solid var(--border); background:var(--hover); color:var(--text); font-weight:600;">✏️ Edit Timetable</button>
               </div>
             </div>
+            <div class="schedule" id="scheduleContainer"></div>
           </div>
 
           <!-- Student List -->
@@ -666,6 +717,9 @@
           <button class="quick-action-btn" id="scan-qr-btn" style="padding:12px;background:var(--accent-2);color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s ease;">
             📱 Scan QR
           </button>
+          <button class="quick-action-btn" id="bulk-attendance-btn" style="padding:12px;background:var(--accent-1);color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s ease;">
+            🗓️ Bulk Attendance
+          </button>
             </div>
           </div>
 
@@ -708,6 +762,75 @@
         </aside>
       </div>
     </main>
+  </div>
+
+  <!-- Notes quick entry card -->
+  <div style="position:fixed; right:20px; bottom:20px; z-index:50; display:flex; gap:8px;">
+    <button id="open-notes-fab" title="Open Notes" aria-label="Open Notes" style="width:auto; padding:12px 14px; display:flex; align-items:center; gap:8px; background: var(--accent-2); color: #fff; border: none; border-radius:12px; font-weight:700; box-shadow:0 8px 24px rgba(0,0,0,0.25);">
+      🗒️ <span style="font-size:13px;">Notes</span>
+    </button>
+  </div>
+
+  <!-- Edit Timetable Modal -->
+  <div id="timetable-modal" style="display:none; position:fixed; inset:0; background: rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center;">
+    <div style="background: var(--bg-b); border:1px solid var(--border); border-radius:16px; width:95%; max-width:700px; max-height:90vh; overflow:auto;">
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--border)">
+        <div style="font-weight:700">Edit Today's Timetable</div>
+        <button id="close-timetable-btn" style="padding:6px 10px; border-radius:8px; background:var(--accent-3); color:#fff; font-weight:600;">✕</button>
+      </div>
+      <div style="padding:12px; display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+        <label>Division</label>
+        <select id="tt-division" style="padding:6px 10px; border-radius:8px; border:1px solid var(--border); background:var(--surface); color:var(--text)">
+          <option value="A">A</option>
+          <option value="B">B</option>
+          <option value="C">C</option>
+        </select>
+        <label>Time</label>
+        <input id="tt-time" placeholder="09:00 - 10:00" style="padding:6px 10px; border-radius:8px; border:1px solid var(--border); background:var(--surface); color:var(--text)" />
+        <label>Subject</label>
+        <input id="tt-subject" placeholder="Subject" style="padding:6px 10px; border-radius:8px; border:1px solid var(--border); background:var(--surface); color:var(--text)" />
+        <label style="display:flex; align-items:center; gap:6px"><input type="checkbox" id="tt-break" /> Break</label>
+        <button id="tt-add" style="padding:8px 12px; border-radius:8px; background:var(--accent-2); color:#fff; font-weight:700">Add</button>
+      </div>
+      <div style="padding:12px">
+        <div class="muted" style="margin-bottom:6px">Today's Slots</div>
+        <div id="tt-list" style="display:flex; flex-direction:column; gap:8px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bulk Attendance Modal -->
+  <div id="bulk-attendance-modal" style="display:none; position:fixed; inset:0; background: rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center;">
+    <div style="background: var(--bg-b); border:1px solid var(--border); border-radius:16px; width:95%; max-width:840px; max-height:92vh; overflow:auto;">
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--border)">
+        <div style="font-weight:700">Bulk Attendance</div>
+        <button id="bulk-close-btn" style="padding:6px 10px; border-radius:8px; background:var(--accent-3); color:#fff; font-weight:600">✕</button>
+      </div>
+      <div style="display:flex; gap:16px; padding:12px; flex-wrap:wrap; align-items:center">
+        <label>Class</label>
+        <select id="bulk-class" style="padding:6px 10px; border-radius:8px; border:1px solid var(--border); background:var(--surface); color:var(--text)"></select>
+        <label>Student</label>
+        <select id="bulk-student" style="min-width:220px; padding:6px 10px; border-radius:8px; border:1px solid var(--border); background:var(--surface); color:var(--text)"></select>
+        <label>Status</label>
+        <select id="bulk-status" style="padding:6px 10px; border-radius:8px; border:1px solid var(--border); background:var(--surface); color:var(--text)">
+          <option value="present">Present</option>
+          <option value="absent">Absent</option>
+        </select>
+        <div style="margin-left:auto; display:flex; gap:8px; align-items:center">
+          <button id="bulk-prev" style="padding:6px 10px; border-radius:8px; border:1px solid var(--border); background:var(--hover); color:var(--text)">◀</button>
+          <div id="bulk-month-label" class="muted" style="min-width:160px; text-align:center"></div>
+          <button id="bulk-next" style="padding:6px 10px; border-radius:8px; border:1px solid var(--border); background:var(--hover); color:var(--text)">▶</button>
+        </div>
+      </div>
+      <div style="padding:12px">
+        <div id="bulk-calendar" style="display:grid; grid-template-columns: repeat(7, 1fr); gap:8px"></div>
+        <div class="muted" style="margin-top:8px; font-size:12px">Tap dates to toggle selection. Green = selected.</div>
+        <div style="display:flex; gap:8px; margin-top:12px; justify-content:flex-end">
+          <button id="bulk-clear" style="padding:8px 12px; border-radius:8px; border:1px solid var(--border); background:var(--hover); color:var(--text)">Clear</button>
+          <button id="bulk-save" style="padding:8px 12px; border-radius:8px; background:var(--accent-1); color:#fff; font-weight:700">Save</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -761,7 +884,17 @@
       let currentClass = '';
       let currentQRCode = '';
       let scanner = null;
-      let attendanceRecords = []; // Store attendance records
+      let attendanceRecords = []; // Store attendance records (in-memory)
+      const LS_KEYS = {
+        attendance: 'dpce_attendance_records',
+        timetable: 'dpce_timetable_v1'
+      };
+      const defaultTimetable = {
+        A: { }, B: { }, C: { }
+      };
+      // Notes state
+      let notes = [];
+      let activeNoteId = null;
 
       // Real-time clock
       function updateClock() {
@@ -953,11 +1086,16 @@
           }))
         };
 
-        // Store in local records
+        // Store in local records and persist to localStorage
         attendanceRecords.push(attendanceRecord);
+        try {
+          const prev = JSON.parse(localStorage.getItem(LS_KEYS.attendance) || '[]');
+          prev.push(attendanceRecord);
+          localStorage.setItem(LS_KEYS.attendance, JSON.stringify(prev));
+        } catch(e) {}
         
-        // In a real application, this would be sent to the server
-        console.log('Saving attendance:', attendanceRecord);
+        // Refresh recent attendance UI
+        renderRecentAttendance();
         
         showNotification(`Attendance saved for ${classInfo.name}! ${Object.values(currentAttendance).filter(s => s === 'present').length} students marked present.`, 'success', 6000);
       }
@@ -1024,6 +1162,34 @@
       updateClock();
       setInterval(updateClock, 1000);
 
+      // Load attendance from LS
+      function loadAttendance() {
+        try {
+          attendanceRecords = JSON.parse(localStorage.getItem(LS_KEYS.attendance) || '[]');
+        } catch(e) { attendanceRecords = []; }
+      }
+
+      function renderRecentAttendance() {
+        const container = document.querySelector('.student-list .students');
+        if (!container) return;
+        container.innerHTML = '';
+        // take last 5 present/absent entries flattened
+        const last = attendanceRecords.slice(-3).reverse();
+        const rows = [];
+        last.forEach(rec => {
+          rec.students.slice(0,5).forEach(st => rows.push({ name: st.name, status: st.status }));
+        });
+        rows.slice(0,5).forEach(r => {
+          const el = document.createElement('div');
+          el.className = 'student';
+          el.innerHTML = `
+            <div class="name">${r.name}</div>
+            <div class="status">${r.status.charAt(0).toUpperCase()+r.status.slice(1)}</div>
+          `;
+          container.appendChild(el);
+        });
+      }
+
       // Theme toggle
       const themeBtn = document.getElementById('themeToggle');
       themeBtn?.addEventListener('click', () => {
@@ -1043,6 +1209,8 @@
         } catch(e) {}
       }
       applySavedTheme();
+      loadAttendance();
+      renderRecentAttendance();
 
       // Set year
       document.getElementById('year').innerText = new Date().getFullYear();
@@ -1065,10 +1233,27 @@
       });
 
       // Navigation
+      const sectionToFile = {
+        dashboard: 'index.html',
+        attendance: 'attendance.html',
+        classes: 'classes.html',
+        students: 'students.html',
+        grades: 'grades.html',
+        reports: 'reports.html',
+        settings: 'settings.html'
+      };
       document.querySelectorAll('.nav-item').forEach(item => {
         item.addEventListener('click', () => {
+          const section = item.getAttribute('data-section');
+          const target = sectionToFile[section] || 'index.html';
           document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
           item.classList.add('active');
+          if (target) {
+            const current = location.pathname.split('/').pop();
+            if (current !== target) {
+              window.location.href = target;
+            }
+          }
         });
       });
 
@@ -1087,6 +1272,116 @@
 
       document.getElementById('view-reports-btn')?.addEventListener('click', () => {
         showNotification('Reports feature will be available soon!', 'info');
+      });
+
+      // ---- BULK ATTENDANCE ----
+      const bulkModal = document.getElementById('bulk-attendance-modal');
+      const bulkOpenBtn = document.getElementById('bulk-attendance-btn');
+      const bulkCloseBtn = document.getElementById('bulk-close-btn');
+      const bulkClassSel = document.getElementById('bulk-class');
+      const bulkStudentSel = document.getElementById('bulk-student');
+      const bulkStatusSel = document.getElementById('bulk-status');
+      const bulkCal = document.getElementById('bulk-calendar');
+      const bulkMonthLabel = document.getElementById('bulk-month-label');
+      const bulkPrev = document.getElementById('bulk-prev');
+      const bulkNext = document.getElementById('bulk-next');
+      const bulkClear = document.getElementById('bulk-clear');
+      const bulkSave = document.getElementById('bulk-save');
+      let bulkYear = new Date().getFullYear();
+      let bulkMonth = new Date().getMonth(); // 0-11
+      let bulkSelected = new Set(); // store epoch days yyyy-mm-dd
+
+      function ymd(date){ return date.toISOString().slice(0,10); }
+      function renderBulkMonth(){
+        bulkCal.innerHTML = '';
+        const first = new Date(bulkYear, bulkMonth, 1);
+        const startDay = first.getDay();
+        const daysInMonth = new Date(bulkYear, bulkMonth+1, 0).getDate();
+        bulkMonthLabel.textContent = first.toLocaleDateString(undefined, { month:'long', year:'numeric' });
+        // headings
+        const weekdays = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        weekdays.forEach(w => {
+          const h = document.createElement('div');
+          h.className = 'muted';
+          h.style.textAlign = 'center';
+          h.style.fontSize = '12px';
+          h.textContent = w;
+          bulkCal.appendChild(h);
+        });
+        // blanks
+        for (let i=0;i<startDay;i++){
+          const b = document.createElement('div');
+          bulkCal.appendChild(b);
+        }
+        // days
+        for (let d=1; d<=daysInMonth; d++){
+          const date = new Date(bulkYear, bulkMonth, d);
+          const key = ymd(date);
+          const cell = document.createElement('button');
+          cell.textContent = String(d);
+          cell.style.cssText = 'padding:10px; border-radius:10px; border:1px solid var(--border); background:var(--surface); color:var(--text); cursor:pointer;';
+          if (bulkSelected.has(key)) {
+            cell.style.background = 'linear-gradient(135deg,#10b981,#059669)';
+            cell.style.color = '#fff';
+          }
+          cell.addEventListener('click', () => {
+            if (bulkSelected.has(key)) bulkSelected.delete(key); else bulkSelected.add(key);
+            renderBulkMonth();
+          });
+          bulkCal.appendChild(cell);
+        }
+      }
+      function openBulk(){
+        // populate classes
+        bulkClassSel.innerHTML = '<option value="">Select class...</option>' + Object.keys(classData).map(id=>`<option value="${id}">${classData[id].name}</option>`).join('');
+        bulkStudentSel.innerHTML = '<option value="">Select student...</option>';
+        bulkSelected.clear();
+        bulkYear = new Date().getFullYear();
+        bulkMonth = new Date().getMonth();
+        renderBulkMonth();
+        bulkModal.style.display = 'flex';
+      }
+      bulkOpenBtn?.addEventListener('click', openBulk);
+      bulkCloseBtn?.addEventListener('click', ()=> bulkModal.style.display='none');
+      bulkPrev?.addEventListener('click', ()=>{ if (--bulkMonth < 0){ bulkMonth=11; bulkYear--; } renderBulkMonth(); });
+      bulkNext?.addEventListener('click', ()=>{ if (++bulkMonth > 11){ bulkMonth=0; bulkYear++; } renderBulkMonth(); });
+      bulkClear?.addEventListener('click', ()=>{ bulkSelected.clear(); renderBulkMonth(); });
+      bulkClassSel?.addEventListener('change', (e)=>{
+        const id = e.target.value;
+        bulkStudentSel.innerHTML = '<option value="">Select student...</option>';
+        if (id && classData[id]){
+          bulkStudentSel.innerHTML += classData[id].students.map(s=>`<option value="${s.id}">${s.name} (${s.roll})</option>`).join('');
+        }
+      });
+      bulkSave?.addEventListener('click', ()=>{
+        const classId = bulkClassSel.value;
+        const studentId = parseInt(bulkStudentSel.value || '0',10);
+        const status = bulkStatusSel.value || 'present';
+        if (!classId || !studentId || bulkSelected.size === 0) { showNotification('Select class, student and at least one date', 'warning'); return; }
+        const classInfo = classData[classId];
+        const student = classInfo.students.find(s=>s.id===studentId);
+        if (!student) { showNotification('Invalid student selection', 'warning'); return; }
+        // load previous
+        let store = [];
+        try { store = JSON.parse(localStorage.getItem(LS_KEYS.attendance) || '[]'); } catch(e) { store = []; }
+        // create one record per date for compatibility
+        bulkSelected.forEach(key => {
+          const dt = new Date(key + 'T09:00:00');
+          const rec = {
+            classId,
+            className: classInfo.name,
+            date: dt.toISOString(),
+            qrCode: '',
+            students: classInfo.students.map(s => ({ ...s, status: s.id===studentId ? status : 'absent' }))
+          };
+          store.push(rec);
+        });
+        try { localStorage.setItem(LS_KEYS.attendance, JSON.stringify(store)); } catch(e) {}
+        // refresh local copies and UI
+        loadAttendance();
+        renderRecentAttendance();
+        showNotification('Bulk attendance saved', 'success');
+        bulkModal.style.display = 'none';
       });
 
       // QR Scanner functionality
@@ -1220,10 +1515,7 @@
         }
       });
 
-      // Welcome notification
-      setTimeout(() => {
-        showNotification('Welcome to your teacher dashboard! Ready to start your day?', 'success');
-      }, 2000);
+      // Welcome notification removed per request
 
       // Mobile sidebar toggle
       const hamburger = document.getElementById('hamburger');
@@ -1267,6 +1559,600 @@
             }
             scannerModal.style.display = 'none';
           }
+          // Close notes modal
+          const notesModal = document.getElementById('notes-modal');
+          if (notesModal && notesModal.style.display === 'flex') {
+            notesModal.style.display = 'none';
+          }
+        }
+      });
+
+      // ---------- TIMETABLE (Teacher editable; Student reads) ----------
+      const timetableData = {
+        // Note: 0 is Sunday, 1 is Monday, ..., 6 is Saturday
+        A: {
+          1: { // MONDAY
+            day: "Monday",
+            schedule: [
+              { time: "9:00 - 10:00", subject: "M-I" },
+              { time: "10:00 - 11:00", subject: "BEE" },
+              { time: "11:00 - 11:15", subject: "LUNCH", isBreak: true },
+              { time: "11:15 - 1:15", subject: "A1-M-I / A2-BEE / A3-PHY" },
+              { time: "01:15 - 02:00", subject: "LUNCH", isBreak: true },
+              { time: "02:00 - 04:00", subject: "A1-M-I / A2-FPL / A3-PCS" },
+            ]
+          },
+          2: { // TUESDAY
+            day: "Tuesday",
+            schedule: [
+              { time: "9:00 - 10:00", subject: "FPL" },
+              { time: "10:00 - 11:00", subject: "EM" },
+              { time: "11:00 - 11:15", subject: "LUNCH", isBreak: true },
+              { time: "11:15 - 12:15", subject: "PHY" },
+              { time: "12:15 - 01:15", subject: "M-I" },
+              { time: "01:15 - 02:00", subject: "Long Break", isBreak: true },
+              { time: "02:00 - 03:00", subject: "DTIL" },
+              { time: "03:00 - 04:00", subject: "BEE" },
+            ]
+          },
+          3: { // WEDNESDAY
+            day: "Wednesday",
+            schedule: [
+              { time: "09:00 - 10:00", subject: "EM" },
+              { time: "10:00 - 11:00", subject: "PHY" },
+              { time: "11:00 - 11:15", subject: "LUNCH", isBreak: true },
+              { time: "11:15 - 01:15", subject: "A1-PCS / A2-M-I / A3-FPL" },
+              { time: "01:15 - 02:00", subject: "Long Break", isBreak: true },
+              { time: "02:00 - 03:00", subject: "M-I" },
+              { time: "03:00 - 04:00", subject: "EM" }, 
+            ]
+          },
+          4: { // THURSDAY
+            day: "Thursday",
+            schedule: [
+              { time: "09:00 - 11:00", subject: "A1-BEE / A2-PHY / A3-EM" },
+              { time: "11:00 - 11:15", subject: "LUNCH", isBreak: true },
+              { time: "11:15 - 01:15", subject: "A1-PHY / A2-EM / A3-BEE" },
+              { time: "01:15 - 02:00", subject: "Short Break", isBreak: true },
+              { time: "02:00 - 03:00", subject: "DTIL" },
+              { time: "03:00 - 04:00", subject: "Extra" },
+            ]
+          },
+          5: { // FRIDAY
+            day: "Friday",
+            schedule: [
+              { time: "9:00 - 10:00", subject: "BEE" },
+              { time: "10:00 - 11:00", subject: "PHY" },
+              { time: "11:00 - 11:15", subject: "Short Break", isBreak: true },
+              { time: "11:15 - 01:15", subject: "A1-FPL / A2-PCS / A3-M-I" },
+              { time: "01:30 - 02:00", subject: "LUNCH", isBreak: true },
+              { time: "02:00 - 03:00", subject: "FPL" },
+              { time: "03:00 - 04:00", subject: "TG" },
+            ]
+          },
+          6: { // SATURDAY
+            day: "Saturday",
+            schedule: [
+              { time: "09:00 - 04:00", subject: "CCC-I" },
+            ]
+          },
+          0: { // SUNDAY
+            day: "Sunday",
+            schedule: [
+              { time: "All Day", subject: "Weekend Holiday!" }
+            ]
+          }
+        },
+        
+        // --- Division B Schedule ---
+        B: {
+          1: { // MONDAY
+            day: "Monday",
+            schedule: [
+              { time: "9:00 - 10:00", subject: "EM" },
+              { time: "10:00 - 11:00", subject: "FPL" },
+              { time: "11:00 - 11:15", subject: "Morning Break", isBreak: true },
+              { time: "11:15 - 12:15", subject: "PHY" },
+              { time: "12:15 - 01:15", subject: "M-I" },
+              { time: "01:15 - 02:00", subject: "Lunch", isBreak: true },
+              { time: "02:00 - 04:00", subject: "A1-EM/A2-BEE/A3-PHY" },
+            ]
+          },
+          2: { // TUESDAY
+            day: "Tuesday",
+            schedule: [
+              { time: "9:00 - 11:00", subject: "A1-BEE/A2-PHY/A3-EM" },
+              { time: "11:00 - 11:15", subject: "Break", isBreak: true },
+              { time: "11:15 - 12:15", subject: "M-I" },
+              { time: "12:15 - 01:15", subject: "PHY" },
+              { time: "01:15 - 02:00", subject: "Lunch", isBreak: true },
+              { time: "02:00 - 04:00", subject: "A1-M-I/A2-PCS/A3-FPL" },
+            ]
+          },
+          3: { 
+            day: "Wednesday", 
+            schedule: [
+              { time: "9:00 - 11:00", subject: "B1-FPL/B2-Lib/B3-PHY" },
+              { time: "11:00 - 11:15", subject: "Break", isBreak: true },
+              { time: "11:15 - 12:15", subject: "PHY" },
+              { time: "12:15 - 01:15", subject: "BEE"},
+              { time: "01:15 - 02:00", subject: "Lunch", isBreak: true },
+              { time: "02:00 - 03:00", subject: "EM"},
+              { time: "03:00 - 04:00", subject: "M-I"},
+            ] 
+          },
+          4: { 
+            day: "Thursday", 
+            schedule: [
+              { time: "9:00 - 10:00", subject: "FPL" },
+              { time: "10:00 - 11:00", subject: "M-I" },
+              { time: "11:00 - 11:15", subject: "Break", isBreak: true },
+              { time: "11:15 - 01:15", subject: "B1-PCS/B2-FPL/B3-M-I" },
+              { time: "01:15 - 02:00", subject: "Lunch", isBreak: true },
+              { time: "02:00 - 4:00", subject:"BEE"}, 
+            ]
+          },
+          5: { 
+            day: "Friday", 
+            schedule: [
+              { time: "9:00 - 10:00", subject: "EM" },
+              { time: "10:00 - 11:00", subject: "BEE" },
+              { time: "11:00 - 11:15", subject: "Break", isBreak: true },
+              { time: "11:15 - 01:15", subject: "B1-PHY/B2-EM/B3-BEE" },
+              { time: "01:15 - 02:00", subject: "Lunch", isBreak: true },
+              { time: "02:00 - 4:00", subject:"DTIL"},
+            ]
+          },
+          6: { 
+            day: "Saturday", 
+            schedule: [
+              { time: "All Day", subject: "CCC-I" }
+            ]
+          },
+          0: { 
+            day: "Sunday", 
+            schedule: [{ time: "All Day", subject: "Weekend Holiday!" }] 
+          }
+        },
+
+        // --- Division C Schedule ---
+        C: {
+          1: { // MONDAY
+            day: "Monday",
+            schedule: [
+              { time: "9:00 - 10:00", subject: "PHY" },
+              { time: "10:00 - 11:00", subject: "M-I" },
+              { time: "11:00 - 11:15", subject: "Break", isBreak: true },
+              { time: "11:15 - 01:15", subject: "C1-Lib/C2-FPL/C3-PCS" },
+              { time: "01:15 - 02:00", subject: "Lunch", isBreak: true },
+              { time: "02:00 - 03:00", subject: "DTIL" },
+              { time: "03:00 - 04:00", subject: "BEE" },
+            ]
+          },
+          2: { 
+            day: "Tuesday", 
+            schedule: [
+              { time: "9:00 - 11:00", subject: "C1-FPL/C2-PCS/C3-Lib" },
+              { time: "11:00 - 11:15", subject: "Break", isBreak: true },
+              { time: "11:15 - 12:15", subject: "PHY" },
+              { time: "12:15 - 01:15", subject: "BEE" },
+              { time: "01:15 - 02:00", subject: "Lunch", isBreak: true },
+              { time: "02:15 - 04:00", subject: "C1-BEE/C2-PHY/C3-EM" },
+            ] 
+          },
+          3: { 
+            day: "Wednesday",
+            schedule: [
+              { time: "9:00 - 11:00", subject: "C1-PHY/C2-EM/C3-BEE" },
+              { time: "11:00 - 11:15", subject: "Break", isBreak: true },
+              { time: "11:15 - 12:15", subject: "EM" },
+              { time: "12:15 - 01:15", subject: "FPL" },
+              { time: "01:15 - 02:00", subject: "Lunch", isBreak: true },
+              { time: "2:00 - 4:00", subject: "C1-PCS/C2-M-I/C3-FPL"},              
+            ]
+          },
+          4: {
+            day: "Thursday", 
+            schedule: [
+              { time: "9:00 - 10:00", subject: "M-I" },
+              { time: "10:00 - 11:00", subject: "BEE" },
+              { time: "11:00 - 11:15", subject: "Break", isBreak: true },
+              { time: "11:15 - 01:15", subject: "C1-EM/C2-BEE/C3-PHY" },
+              { time: "01:15 - 02:00", subject: "Lunch", isBreak: true },
+              { time: "02:00 - 3:00", subject: "FPL" },
+              { time: "3:00 - 4:00", subject: "EM"},              
+            ]
+          },
+          5: { 
+            day: "Friday",
+            schedule: [
+              { time: "9:00 - 10:00", subject: "PHY" },
+              { time: "10:00 - 11:00", subject: "EM" },
+              { time: "11:00 - 11:15", subject: "Break", isBreak: true },
+              { time: "11:15 - 12:15", subject: "M-I" },
+              { time: "12:15 - 01:15", subject: "DTIL" },
+              { time: "01:15 - 02:00", subject: "Lunch", isBreak: true },
+              { time: "02:00 - 3:00", subject: "TG/EXTRA" },
+            ]
+          },
+          6: { 
+            day: "Saturday", 
+            schedule: [{ time: "All Day", subject: "CCC-I" }] 
+          },
+          0: { 
+            day: "Sunday", 
+            schedule: [{ time: "All Day", subject: "Weekend Holiday" }] 
+          }
+        }
+      };
+
+      function getTodayKey() { return new Date().getDay(); }
+      function loadTimetable() {
+        try { return JSON.parse(localStorage.getItem(LS_KEYS.timetable) || 'null') || timetableData; } catch(e){ return timetableData; }
+      }
+      function saveTimetable(data) {
+        try { localStorage.setItem(LS_KEYS.timetable, JSON.stringify(data)); } catch(e) {}
+      }
+      function renderDailyTimetable() {
+        const divisionSelector = document.getElementById('divisionSelector');
+        const divVal = divisionSelector ? divisionSelector.value : 'A';
+        const day = getTodayKey();
+        const data = loadTimetable();
+        const today = data[divVal]?.[day] || { day: new Date().toLocaleDateString(undefined,{weekday:'long'}), schedule: [] };
+        const heading = document.getElementById('todayScheduleDay');
+        const container = document.getElementById('scheduleContainer');
+        if (heading) heading.innerText = `${today.day}'s Class Timings (Division ${divVal})`;
+        if (container) {
+          container.innerHTML = '';
+          (today.schedule||[]).forEach(slot => {
+            const slotDiv = document.createElement('div');
+            slotDiv.className = 'slot';
+            if (slot.isBreak) slotDiv.style.background = 'var(--glass)';
+            slotDiv.innerHTML = `<div class="time">${slot.time}</div><div class="sub">${slot.subject}</div>`;
+            container.appendChild(slotDiv);
+          });
+        }
+      }
+      // Initialize with comprehensive timetable data
+      (function initializeTimetable(){
+        const data = loadTimetable();
+        // Only save if localStorage is empty or doesn't have the full structure
+        if (!data.A || !data.A[1] || !data.B || !data.C) {
+          saveTimetable(timetableData);
+        }
+      })();
+
+      renderDailyTimetable();
+      document.getElementById('divisionSelector')?.addEventListener('change', renderDailyTimetable);
+      document.getElementById('editTimetableBtn')?.addEventListener('click', () => {
+        const modal = document.getElementById('timetable-modal');
+        const divSel = document.getElementById('tt-division');
+        const currentDiv = document.getElementById('divisionSelector')?.value || 'A';
+        if (divSel) divSel.value = currentDiv;
+        renderTTList();
+        modal.style.display = 'flex';
+      });
+      document.getElementById('close-timetable-btn')?.addEventListener('click', () => {
+        document.getElementById('timetable-modal').style.display = 'none';
+        renderDailyTimetable();
+      });
+      document.getElementById('tt-add')?.addEventListener('click', () => {
+        const div = document.getElementById('tt-division').value;
+        const time = document.getElementById('tt-time').value.trim();
+        const subject = document.getElementById('tt-subject').value.trim();
+        const isBreak = document.getElementById('tt-break').checked;
+        if (!time || !subject) return;
+        const data = loadTimetable();
+        const day = getTodayKey();
+        if (!data[div]) data[div] = {};
+        if (!data[div][day]) data[div][day] = { day: new Date().toLocaleDateString(undefined,{weekday:'long'}), schedule: [] };
+        data[div][day].schedule.push({ time, subject, isBreak });
+        saveTimetable(data);
+        document.getElementById('tt-time').value = '';
+        document.getElementById('tt-subject').value = '';
+        document.getElementById('tt-break').checked = false;
+        renderTTList();
+      });
+
+      function renderTTList() {
+        const list = document.getElementById('tt-list');
+        const div = document.getElementById('tt-division').value;
+        const day = getTodayKey();
+        const data = loadTimetable();
+        const items = data[div]?.[day]?.schedule || [];
+        list.innerHTML = '';
+        items.forEach((slot, idx) => {
+          const row = document.createElement('div');
+          row.style.cssText = 'display:flex; gap:8px; align-items:center; border:1px solid var(--border); padding:8px; border-radius:10px; background:var(--surface)';
+          row.innerHTML = `
+            <div style="flex:1; min-width:0; display:flex; gap:8px; align-items:center">
+              <input data-tt-time="${idx}" value="${slot.time}" style="flex:0.6; min-width:120px; padding:6px 8px; border-radius:8px; border:1px solid var(--border); background:var(--bg-b); color:var(--text)" />
+              <input data-tt-subject="${idx}" value="${slot.subject}" style="flex:1; min-width:160px; padding:6px 8px; border-radius:8px; border:1px solid var(--border); background:var(--bg-b); color:var(--text)" />
+              <label style="display:flex; align-items:center; gap:6px; font-size:12px"><input type="checkbox" data-tt-break="${idx}" ${slot.isBreak? 'checked':''}/> Break</label>
+            </div>
+            <button data-tt-del="${idx}" style="padding:6px 10px; border-radius:8px; background:var(--accent-3); color:#fff; font-weight:600">Delete</button>
+          `;
+          list.appendChild(row);
+        });
+        list.querySelectorAll('[data-tt-del]')?.forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const idx = parseInt(e.currentTarget.getAttribute('data-tt-del'));
+            const data = loadTimetable();
+            data[div][day].schedule.splice(idx,1);
+            saveTimetable(data);
+            renderTTList();
+          });
+        });
+        list.querySelectorAll('[data-tt-time]')?.forEach(inp => inp.addEventListener('input', onTTEdit));
+        list.querySelectorAll('[data-tt-subject]')?.forEach(inp => inp.addEventListener('input', onTTEdit));
+        list.querySelectorAll('[data-tt-break]')?.forEach(inp => inp.addEventListener('change', onTTEdit));
+      }
+      function onTTEdit(e){
+        const div = document.getElementById('tt-division').value;
+        const day = getTodayKey();
+        const data = loadTimetable();
+        const target = e.target;
+        const timeIdx = target.getAttribute('data-tt-time');
+        const subjIdx = target.getAttribute('data-tt-subject');
+        const breakIdx = target.getAttribute('data-tt-break');
+        const idx = parseInt(timeIdx||subjIdx||breakIdx);
+        if (!isNaN(idx)) {
+          const slot = data[div][day].schedule[idx];
+          if (timeIdx !== null) slot.time = target.value;
+          if (subjIdx !== null) slot.subject = target.value;
+          if (breakIdx !== null) slot.isBreak = target.checked;
+          saveTimetable(data);
+        }
+      }
+
+      // ---------- NOTES APP ----------
+      function loadNotes() {
+        try {
+          const raw = localStorage.getItem('dpce_notes');
+          notes = raw ? JSON.parse(raw) : [];
+        } catch(e) {
+          notes = [];
+        }
+      }
+
+      function persistNotes() {
+        try { localStorage.setItem('dpce_notes', JSON.stringify(notes)); } catch(e) {}
+      }
+
+      function renderNotesList(filterText = '', sort = 'updated-desc') {
+        const list = document.getElementById('notes-list');
+        if (!list) return;
+        const needle = filterText.trim().toLowerCase();
+        let items = notes.map(n => ({...n}));
+        if (needle) {
+          items = items.filter(n => (n.title||'').toLowerCase().includes(needle) || (n.content||'').toLowerCase().includes(needle) || (n.tags||[]).join(',').toLowerCase().includes(needle));
+        }
+        // sort
+        const by = {
+          'updated-desc': (a,b) => (b.updatedAt||0) - (a.updatedAt||0),
+          'updated-asc': (a,b) => (a.updatedAt||0) - (b.updatedAt||0),
+          'created-desc': (a,b) => (b.createdAt||0) - (a.createdAt||0),
+          'created-asc': (a,b) => (a.createdAt||0) - (b.createdAt||0),
+          'title-asc': (a,b) => (a.title||'').localeCompare(b.title||''),
+          'title-desc': (a,b) => (b.title||'').localeCompare(a.title||'')
+        }[sort];
+        items.sort(by);
+        // pinned first
+        items.sort((a,b) => (b.pinned?1:0) - (a.pinned?1:0));
+
+        list.innerHTML = '';
+        items.forEach(n => {
+          const row = document.createElement('div');
+          row.style.cssText = `padding:10px; border:1px solid var(--border); border-radius:10px; cursor:pointer; background:${n.color||'var(--surface)'}; display:flex; gap:8px; align-items:center;`;
+          row.dataset.noteId = n.id;
+          row.innerHTML = `
+            <div>${n.pinned ? '📌' : '🗒️'}</div>
+            <div style="flex:1; min-width:0;">
+              <div style="font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${n.title||'Untitled'}</div>
+              <div class="muted" style="font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${stripHtml(n.content||'').slice(0,80)}</div>
+            </div>
+            <div class="muted" style="font-size:11px;">${formatShortDate(n.updatedAt||n.createdAt)}</div>
+          `;
+          row.addEventListener('click', () => openNote(n.id));
+          list.appendChild(row);
+        });
+      }
+
+      function stripHtml(html) {
+        const tmp = document.createElement('div');
+        tmp.innerHTML = html;
+        return tmp.textContent || tmp.innerText || '';
+      }
+
+      function formatShortDate(ts) {
+        if (!ts) return '';
+        const d = new Date(ts);
+        return d.toLocaleString(undefined, { month:'short', day:'2-digit', hour:'2-digit', minute:'2-digit' });
+      }
+
+      function newNote() {
+        const id = 'n_' + Math.random().toString(36).slice(2,9);
+        const now = Date.now();
+        const note = { id, title:'', content:'', color:'var(--surface)', pinned:false, tags:[], createdAt:now, updatedAt:now };
+        notes.unshift(note);
+        activeNoteId = id;
+        persistNotes();
+        renderNotesList(document.getElementById('notes-search')?.value || '', document.getElementById('notes-sort')?.value || 'updated-desc');
+        bindEditorTo(id);
+      }
+
+      function openNote(id) {
+        activeNoteId = id;
+        bindEditorTo(id);
+      }
+
+      function bindEditorTo(id) {
+        const note = notes.find(n => n.id === id);
+        if (!note) return;
+        const title = document.getElementById('note-title');
+        const tags = document.getElementById('note-tags');
+        const color = document.getElementById('note-color');
+        const editor = document.getElementById('note-editor');
+        const pinBtn = document.getElementById('pin-note-btn');
+        title.value = note.title||'';
+        tags.value = (note.tags||[]).join(', ');
+        color.value = toColorInputValue(note.color);
+        editor.innerHTML = note.content||'';
+        editor.style.background = note.color || 'var(--surface)';
+        pinBtn.textContent = note.pinned ? '📌 Pinned' : '📌 Pin';
+      }
+
+      function toColorInputValue(color) {
+        const ctx = document.createElement('canvas').getContext('2d');
+        ctx.fillStyle = color || '#ffffff';
+        return rgbToHex(ctx.fillStyle);
+      }
+
+      function rgbToHex(rgb) {
+        const m = rgb.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+        if (!m) return '#ffffff';
+        const r = parseInt(m[1]).toString(16).padStart(2,'0');
+        const g = parseInt(m[2]).toString(16).padStart(2,'0');
+        const b = parseInt(m[3]).toString(16).padStart(2,'0');
+        return `#${r}${g}${b}`;
+      }
+
+      function updateActiveNote(partial) {
+        const note = notes.find(n => n.id === activeNoteId);
+        if (!note) return;
+        Object.assign(note, partial, { updatedAt: Date.now() });
+        persistNotes();
+        renderNotesList(document.getElementById('notes-search')?.value || '', document.getElementById('notes-sort')?.value || 'updated-desc');
+      }
+
+      function deleteActiveNote() {
+        if (!activeNoteId) return;
+        const idx = notes.findIndex(n => n.id === activeNoteId);
+        if (idx >= 0) {
+          notes.splice(idx,1);
+          activeNoteId = null;
+          persistNotes();
+          renderNotesList(document.getElementById('notes-search')?.value || '', document.getElementById('notes-sort')?.value || 'updated-desc');
+          // clear editor
+          document.getElementById('note-title').value = '';
+          document.getElementById('note-tags').value = '';
+          const editor = document.getElementById('note-editor');
+          editor.innerHTML = '';
+          editor.style.background = 'var(--surface)';
+        }
+      }
+
+      // Toolbar actions
+      function exec(cmd, value = null) {
+        document.execCommand(cmd, false, value);
+        const editor = document.getElementById('note-editor');
+        updateActiveNote({ content: editor.innerHTML });
+      }
+
+      function insertChecklist() {
+        const editor = document.getElementById('note-editor');
+        const sel = window.getSelection();
+        if (!sel || sel.rangeCount === 0) { editor.focus(); }
+        const ul = document.createElement('ul');
+        ul.style.listStyle = 'none';
+        ul.style.paddingLeft = '0';
+        const li = document.createElement('li');
+        li.innerHTML = `<input type="checkbox" /> <span>Task</span>`;
+        ul.appendChild(li);
+        document.execCommand('insertHTML', false, ul.outerHTML);
+        updateActiveNote({ content: editor.innerHTML });
+      }
+
+      function openNotesModal() {
+        const modal = document.getElementById('notes-modal');
+        modal.style.display = 'flex';
+      }
+
+      // Notes event bindings
+      loadNotes();
+      renderNotesList();
+
+      document.getElementById('open-notes-fab')?.addEventListener('click', openNotesModal);
+      document.getElementById('close-notes-btn')?.addEventListener('click', () => {
+        document.getElementById('notes-modal').style.display = 'none';
+      });
+      document.getElementById('new-note-btn')?.addEventListener('click', newNote);
+      document.getElementById('notes-search')?.addEventListener('input', (e) => {
+        renderNotesList(e.target.value, document.getElementById('notes-sort')?.value || 'updated-desc');
+      });
+      document.getElementById('notes-sort')?.addEventListener('change', (e) => {
+        renderNotesList(document.getElementById('notes-search')?.value || '', e.target.value);
+      });
+      document.getElementById('note-title')?.addEventListener('input', (e) => {
+        updateActiveNote({ title: e.target.value });
+      });
+      document.getElementById('note-tags')?.addEventListener('input', (e) => {
+        const tags = e.target.value.split(',').map(t => t.trim()).filter(Boolean);
+        updateActiveNote({ tags });
+      });
+      document.getElementById('note-color')?.addEventListener('input', (e) => {
+        const color = e.target.value;
+        const editor = document.getElementById('note-editor');
+        editor.style.background = color;
+        updateActiveNote({ color });
+      });
+      document.getElementById('pin-note-btn')?.addEventListener('click', () => {
+        const n = notes.find(n => n.id === activeNoteId);
+        if (!n) return;
+        n.pinned = !n.pinned;
+        updateActiveNote({ pinned: n.pinned });
+        bindEditorTo(activeNoteId);
+      });
+      document.getElementById('delete-note-btn')?.addEventListener('click', () => {
+        if (confirm('Delete this note?')) deleteActiveNote();
+      });
+      // Toolbar buttons
+      document.querySelectorAll('.ntb[data-cmd]')?.forEach(btn => {
+        btn.addEventListener('click', () => exec(btn.getAttribute('data-cmd')));
+      });
+      document.getElementById('checkbox-list-btn')?.addEventListener('click', insertChecklist);
+      document.getElementById('link-btn')?.addEventListener('click', () => {
+        const url = prompt('Enter URL');
+        if (url) exec('createLink', url);
+      });
+      document.getElementById('text-color')?.addEventListener('input', (e) => exec('foreColor', e.target.value));
+      document.getElementById('hilite-color')?.addEventListener('input', (e) => exec('hiliteColor', e.target.value));
+      document.getElementById('clear-format-btn')?.addEventListener('click', () => exec('removeFormat'));
+      // Editor input autosave
+      const editorEl = document.getElementById('note-editor');
+      let saveTimer = null;
+      editorEl?.addEventListener('input', () => {
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(() => updateActiveNote({ content: editorEl.innerHTML }), 300);
+      });
+      // Export/Import
+      document.getElementById('export-notes-btn')?.addEventListener('click', () => {
+        const blob = new Blob([JSON.stringify(notes, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'notes-export.json';
+        a.click();
+        URL.revokeObjectURL(a.href);
+      });
+      document.getElementById('import-notes-btn')?.addEventListener('click', () => {
+        document.getElementById('import-notes-input').click();
+      });
+      document.getElementById('import-notes-input')?.addEventListener('change', async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const text = await file.text();
+        try {
+          const data = JSON.parse(text);
+          if (Array.isArray(data)) {
+            notes = data;
+            persistNotes();
+            renderNotesList();
+            showNotification('Notes imported successfully', 'success');
+          } else {
+            showNotification('Invalid import file', 'warning');
+          }
+        } catch(err) {
+          showNotification('Failed to import notes', 'warning');
         }
       });
     });
